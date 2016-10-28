@@ -1,0 +1,25 @@
+#
+# This applies to all hosts except perfSONAR because it takes care of ntp
+#
+# Based on steps https://www.certdepot.net/rhel7-set-ntp-service/
+# Augmenent with RedHat Docs ntpdate config
+#
+- hosts: 'bro, dtn'
+  become: yes
+  become_user: root
+  vars_files:
+    - site_vars.yaml
+
+  tasks:
+    - name: set timezone to site timezone
+      shell: cp /usr/share/zoneinfo/{{ timezone }} /etc/localtime
+      when: ansible_distribution == "CentOS"
+
+    - name: install ntp package
+      yum: name=ntp state=present
+
+    - name: synchorinze clock
+      shell: ntpdate 0.centos.pool.ntp.org 1.centos.pool.ntp.org
+
+    - name: activate ntp service at boot and start it
+      service: name=ntpd enabled=yes state=started

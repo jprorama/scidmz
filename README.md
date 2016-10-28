@@ -40,3 +40,14 @@ ansible_playbook -i hosts set_admins.yaml
 
 You'll only need to run this once and maybe never, but it's here for completeness.
 
+## Timezone
+
+Your host should agree on time and timezone.  Set the timezone in the site_vars.yaml
+and get time setup and in place with:
+
+```sh
+ansible-playbook -i hosts config_ntp.yaml
+```
+
+Note perfSONAR sets up ntp install so this host is not changed.
+
