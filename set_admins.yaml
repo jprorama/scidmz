@@ -1,0 +1,16 @@
+#
+# bootstrap the ansible config
+#
+# helper file to set the ansible admin account(s) without passwords
+# typically run with --ask-password from an account that has sudo priviledge
+# after an initial image install
+#
+- hosts: 'all'
+  become: yes
+  become_user: root
+  vars_files:
+    - site_vars.yaml
+
+  tasks:
+  - name: set ansible sudoers to no password
+    copy: src=config/sudoers/zz-ansible-admin dest=/etc/sudoers.d/zz-ansible-admin validate='visudo -cf %s'
