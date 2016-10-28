@@ -1,0 +1,7 @@
+#
+# Example site vars file for variables to pass to playbooks
+# 
+# Adjust to your needs and copy to site_vars.yaml
+# Examples are provided to describe intended format
+# 
+timezone: 'US/Central'

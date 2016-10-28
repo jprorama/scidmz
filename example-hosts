@@ -1,0 +1,6 @@
+bro ansible_host=bro.example.org
+ps ansible_host=ps.example.org
+
+[dtn]
+dtn1 ansible_host=dtn1.example.org
+dtn2 ansible_host=dtn2.example.org
