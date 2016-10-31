@@ -20,7 +20,7 @@
     firewalld: service=https permanent=true state=enabled
 
   - name: open inbound port range for GridFTP data channels
-    firewalld: port=50000—51000/tcp permanent=true state=enabled
+    firewalld: port=50000-51000/tcp permanent=true state=enabled
 
   - name: create gridftp control channel zone
     shell: firewall-cmd --permanent --new-zone=gridftp-control
