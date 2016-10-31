@@ -5,3 +5,4 @@
 # Examples are provided to describe intended format
 # 
 timezone: 'US/Central'
+globus_endpoint_name: "{{ globus_username }}#{{ ansible_hostname }}"

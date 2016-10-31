@@ -41,3 +41,5 @@
 
    vars:
      globus_endpoint_name: "{{ globus_username }}#{{ ansible_hostname }}"
+   vars_files:
+     - site_vars.yaml
