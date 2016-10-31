@@ -1,5 +1,7 @@
 ---
- - hosts: headnode
+ - hosts: dtn1
+   become: yes
+   become_user: root
    gather_facts: yes
    tasks:
 
@@ -8,6 +10,9 @@
 
    - name: get globus gpg key
      rpm_key: state=present key=http://toolkit.globus.org/ftppub/globus-connect-server/RPM-GPG-KEY-Globus
+
+   - name: install yum-plugin-priorities
+     yum: name=yum-plugin-priorities state=present
 
    - name: install globus-connect-server
      yum: name=globus-connect-server state=present enablerepo=base
