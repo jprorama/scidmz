@@ -39,3 +39,6 @@
 
   - name: open inbound MyProxy port
     firewalld: zone=globusonline port=7512/tcp permanent=true state=enabled
+
+  - name: reload firewalld to apply permanent configuration
+    shell: firewall-cmd --reload
