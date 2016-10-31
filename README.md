@@ -51,3 +51,15 @@ ansible-playbook -i hosts config_ntp.yaml
 
 Note perfSONAR sets up ntp install so this host is not changed.
 
+# DTN Configuration
+
+## Update firewall
+
+The GridFTP requires ports open for access to control channels to initiate transfers
+and data channels to move data between sites.  The control channel is managed
+by globusonline.org.  The rule sets add permissions for globusonline to initiate
+third-party transfers and allow data to flow to any site.
+
+The configuration uses [firewalld zones](https://www.hogarthuk.com/?q=node/9) to
+control source IP restrictions from globusonline.org.  The on-disk firewall is
+updated and then reloaded into the current state.

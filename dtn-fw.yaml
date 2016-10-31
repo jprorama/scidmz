@@ -1,0 +1,44 @@
+#
+# Configure firewall to support Globus services
+#
+# https://docs.globus.org/resource-provider-guide/#open-tcp-ports_section
+#
+# Assumes that CentOS7 configures the public zone by default on the host nic
+#
+# Outbound connections are allowed by default so Outbound restrictions for
+# port 2223 and 443 are not implemented
+#
+- hosts: 'dtn'
+  become: yes
+  become_user: root
+  vars_files:
+  - site_vars.yaml
+
+
+  tasks:
+  - name: open inbound https for oAuth
+    firewalld: service=https permanent=true state=enabled
+
+  - name: open inbound port range for GridFTP data channels
+    firewalld: port=50000-51000/tcp permanent=true state=enabled
+
+  - name: create globusonline.org zone for GridFTP control channel and MyProxy
+    shell: firewall-cmd --permanent --new-zone=globusonline
+    register: command_result
+    failed_when: "command_result.rc != 0 and command_result.rc != 26"
+    changed_when: "command_result.rc == 0"
+
+  - name: add GridFTP control channel from globusonline.org host 1
+    firewalld: zone=globusonline source=184.73.189.163 permanent=true state=enabled
+
+  - name: add GridFTP control channel from globusonline.org host 2
+    firewalld: zone=globusonline source=174.129.226.69 permanent=true state=enabled
+
+  - name: open inbound GridFTP control channel ports
+    firewalld: zone=globusonline port=2811/tcp permanent=true state=enabled
+
+  - name: open inbound MyProxy port
+    firewalld: zone=globusonline port=7512/tcp permanent=true state=enabled
+
+  - name: reload firewalld to apply permanent configuration
+    shell: firewall-cmd --reload
