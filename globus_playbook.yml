@@ -11,9 +11,6 @@
 
    - name: install globus-connect-server
      yum: name=globus-connect-server state=present enablerepo=base
-
-   - name: test
-     shell: echo {{ ansible_hostname }}  > test1.tmp
    
  - hosts: headnode
    gather_facts: yes
