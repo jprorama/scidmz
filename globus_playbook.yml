@@ -15,7 +15,7 @@
      yum: name=yum-plugin-priorities state=present
 
    - name: install globus-connect-server
-     yum: name=myproxy-6.1.18-1.el7+gt6.x86_64,myproxy-server-6.1.18-1.el7+gt6.x86_64,globus-connect-server state=present enablerepo=base
+     yum: name=globus-connect-server state=present enablerepo=base
 
  - hosts: dtn1
    become: yes
