@@ -1,5 +1,5 @@
 ---
- - hosts: dtn1
+ - hosts: dtn
    become: yes
    become_user: root
    gather_facts: yes
@@ -17,7 +17,7 @@
    - name: install globus-connect-server
      yum: name=globus-connect-server state=present enablerepo=base
 
- - hosts: dtn1
+ - hosts: dtn
    become: yes
    become_user: root
    gather_facts: yes
