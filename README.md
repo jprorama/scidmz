@@ -63,3 +63,23 @@ third-party transfers and allow data to flow to any site.
 The configuration uses [firewalld zones](https://www.hogarthuk.com/?q=node/9) to
 control source IP restrictions from globusonline.org.  The on-disk firewall is
 updated and then reloaded into the current state.
+
+##  Apply the Globus On-line configuration
+
+The [Globus configuration](https://docs.globus.org/resource-provider-guide/#install_section)
+installs globus-connect-server metapackage and sets up GridFTP endpoints for use
+on globus.org.   It is derived from the
+[XSEDE Campus Bridging project's playbook](https://software.xsede.org/cb/centos6/noarch/extras/XCBC_Ansible/globus_playbook.yml)
+distribed as part of a ROCKS Roll for an XSEDE Compatible Basic Cluster.   It's
+adjusted to apply to the "ScienceDMZ cluster" model implemented in this project.
+It also prefers CILogon integration.
+
+```sh
+ansible-playbook -i hosts globus_playbook.yml
+```
+
+Note, the final playbook step registers the endpoints with globus.org.
+This required a pexpect package installed on the DTNs.
+The pexpect version 2.3 included with CentOS7 is less than the reported
+compatible 3.3+ required by the expect module.  This step can be run by hand if
+if required dependency is not met.
