@@ -1,0 +1,13 @@
+#
+# This gets the install log of a machine manually configured
+#
+#
+- hosts: 'dtn'
+  become: yes
+  become_user: root
+  vars_files:
+    - site_vars.yaml
+
+  tasks:
+    - name: get the anaconda kickstart
+      fetch: src=/root/anaconda-ks.cfg dest=install-{{ inventory_hostname }}
