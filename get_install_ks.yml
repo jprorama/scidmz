@@ -11,3 +11,11 @@
   tasks:
     - name: get the anaconda kickstart
       fetch: src=/root/anaconda-ks.cfg dest=install-{{ inventory_hostname }}
+
+    - shell: find /var/log/anaconda -maxdepth 1 -type f
+      register: files_to_copy
+
+    - name: fetch the anaconda log dir
+      fetch: src={{ item }} dest=install-{{ inventory_hostname }}
+      with_items: files_to_copy.stdout_lines
+
