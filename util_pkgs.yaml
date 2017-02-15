@@ -1,0 +1,18 @@
+#
+# This applies to all hosts except perfSONAR because it takes care of ntp
+#
+# Based on steps https://www.certdepot.net/rhel7-set-ntp-service/
+# Augmenent with RedHat Docs ntpdate config
+#
+- hosts: 'dtn'
+  become: yes
+  become_user: root
+  vars_files:
+    - site_vars.yaml
+
+  tasks:
+    - name: add utility packages to nodes
+      yum: name={{ item }} state=present
+      with_items:
+        - tcpdump
+        
