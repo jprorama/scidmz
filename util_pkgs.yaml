@@ -1,0 +1,40 @@
+#
+# These are additional packages that are useful for connection or perf tests
+#
+# For info on ESnet network trouble shooting tools
+#
+# https://fasterdata.es.net/performance-testing/network-troubleshooting-tools/
+#
+- hosts: 'bro, dtn'
+  become: yes
+  become_user: root
+  vars_files:
+    - site_vars.yaml
+
+  tasks:
+    # perfSONAR 4.0 supports CentOS7 but is still in RC3 status
+    # http://www.perfsonar.net/#20170125-release
+    #
+    # For now we use the Internet2-repo plus the staging repo to get at the RC3
+    # content
+    - name: add ESnet network tools repo (https://fasterdata.es.net/science-dmz/DTN/dtn-software/)
+      yum: name={{ item }} state=present
+      with_items:
+        - http://software.internet2.edu/rpms/el7/x86_64/main/RPMS/Internet2-repo-0.7-1.noarch.rpm
+        - http://software.internet2.edu/rpms/el7/x86_64/main/RPMS/Internet2-repo-staging-0.7-1.noarch.rpm
+
+    - name: add general network testing and utility packages to nodes
+      yum: name={{ item }} state=present update_cache=yes
+      with_items:
+        - tcpdump
+        - bind-utils
+        - traceroute
+        - lsb
+        - yum-utils
+        - net-tools
+        - ntp
+
+    - name: add ESnet recommended perfsonar-tools for iperf, bwctl and owamp
+      yum: name={{ item }} state=present update_cache=yes
+      with_items:
+        - perfsonar-tools
