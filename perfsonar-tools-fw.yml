@@ -22,5 +22,14 @@
   - name: open inbound port range for owampd test channels
     firewalld: port=8760-9960/udp permanent=true state=enabled
 
+  - name: open inbound control port for bwctl iperf test scheduleing
+    firewalld: port=4823/tcp permanent=true state=enabled
+
+  - name: open inbound port range for bwctl peers for clock validation and results
+    firewalld: port=6001-6200/tcp permanent=true state=enabled
+
+  - name: open inbound port range for bwctl iperf servers
+    firewalld: port=5001-5900/tcp permanent=true state=enabled
+
   - name: reload firewalld to apply permanent configuration
     shell: firewall-cmd --reload
