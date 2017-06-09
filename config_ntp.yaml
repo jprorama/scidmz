@@ -18,8 +18,15 @@
     - name: install ntp package
       yum: name=ntp state=present
 
-    - name: synchorinze clock
+    - name: check if ntpd is running
+      command: systemctl status ntpd
+      ignore_errors: yes
+      changed_when: false
+      register: service_ntpd_status
+
+    - name: initial synchorinze clock
       shell: ntpdate 0.centos.pool.ntp.org 1.centos.pool.ntp.org
+      when: service_ntpd_status | failed
 
     - name: activate ntp service at boot and start it
       service: name=ntpd enabled=yes state=started
