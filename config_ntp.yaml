@@ -11,9 +11,9 @@
     - site_vars.yaml
 
   tasks:
-    - name: set timezone to site timezone
-      shell: cp /usr/share/zoneinfo/{{ timezone }} /etc/localtime
-      when: ansible_distribution == "CentOS"
+    - name: "set timezone to site {{ timezone }}"
+      timezone:
+         name: "{{ timezone }}"
 
     - name: install ntp package
       yum: name=ntp state=present
