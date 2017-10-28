@@ -2,7 +2,7 @@
 # This gets the install log of a machine manually configured
 #
 #
-- hosts: 'dtn'
+- hosts: 'bro, dtn'
   become: yes
   become_user: root
   vars_files:
