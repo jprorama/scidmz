@@ -8,7 +8,7 @@
 # Outbound connections are allowed by default so Outbound restrictions for
 # owampd are not implemented
 #
-- hosts: 'dtn'
+- hosts: 'bro, dtn'
   become: yes
   become_user: root
   vars_files:
