@@ -29,6 +29,7 @@
         - bind-utils
         - traceroute
         - lsb
+        - yum-cron
         - yum-utils
         - net-tools
         - ntp
