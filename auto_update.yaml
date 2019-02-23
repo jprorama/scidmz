@@ -1,0 +1,22 @@
+#
+# This ensures auto update via yum-cron is installed and active`
+#
+# https://linuxaria.com/howto/enabling-automatic-updates-in-centos-7-and-rhel-7`
+#
+- hosts: 'bro, dtn'
+  become: yes
+  become_user: root
+  vars_files:
+    - site_vars.yaml
+
+  tasks:
+    - name: add auto update support pakage
+      yum: name={{ item }} state=present update_cache=yes
+      with_items:
+        - yum-cron
+
+    - name: enable auto apply of packages
+      lineinfile:
+        path: /etc/yum/yum-cron.conf
+        regexp: '^apply_updates ='
+        line: 'apply_updates = yes'
