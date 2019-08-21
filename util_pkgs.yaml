@@ -33,6 +33,7 @@
         - yum-utils
         - net-tools
         - ntp
+        - ipmitool
 
     - name: add ESnet recommended perfsonar-tools for iperf, bwctl and owamp
       yum: name={{ item }} state=present update_cache=yes
