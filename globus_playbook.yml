@@ -23,7 +23,10 @@
    gather_facts: yes
    tasks:
 
-   - template: src=conf_files/globus-connect-server.conf dest=/etc/globus-connect-server.conf
+   - template:
+       src: conf_files/globus-connect-server.conf
+       dest: /etc/globus-connect-server.conf
+       backup: yes
 
    - expect:
        command: globus-connect-server-setup
