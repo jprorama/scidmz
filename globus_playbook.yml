@@ -6,10 +6,10 @@
    tasks:
 
    - name: install globus repo
-     yum: name=http://toolkit.globus.org/ftppub/globus-connect-server/globus-connect-server-repo-latest.noarch.rpm state=present
+     yum: name=https://downloads.globus.org/toolkit/globus-connect-server/globus-connect-server-repo-latest.noarch.rpm state=present
 
    - name: get globus gpg key
-     rpm_key: state=present key=http://toolkit.globus.org/ftppub/globus-connect-server/RPM-GPG-KEY-Globus
+     rpm_key: state=present key=https://downloads.globus.org/toolkit/gt6/stable/repo/rpm/RPM-GPG-KEY-Globus
 
    - name: install yum-plugin-priorities
      yum: name=yum-plugin-priorities state=present
