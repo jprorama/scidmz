@@ -34,8 +34,19 @@
         - net-tools
         - ntp
         - ipmitool
+        - ksh
+        - gcc
+        - gcc-c++
+        - cpp
+
 
     - name: add ESnet recommended perfsonar-tools for iperf, bwctl and owamp
       yum: name={{ item }} state=present update_cache=yes
       with_items:
         - perfsonar-tools
+
+    - name: add kernel headers and devel to support special driver installs
+      yum: name={{ item }} state-present update_cache=yes
+      with_items:
+        - kernel-headers
+        - kernel-devel
