@@ -1,0 +1,67 @@
+#
+# Configure the DTNs to query system LDAP for user and group databased
+#
+#
+---
+ - hosts: dtn
+   become: yes
+   become_user: root
+   gather_facts: yes
+   vars:
+     sssd_ldap_domain_tag: sssd_ldap_domain
+     ldap_account_server: ldapserver
+     ldap_account_search_base: dc=division,dc=site
+     ldap_auth_server: ldapauthserver
+     ldap_auth_search_base: ou=people,dc=some,dc=org
+     
+   tasks:
+
+   - name: install ldap, pam, and sssd packages
+     yum: name={{ item }} state=present update_cache=yes
+     with_items:
+       - sssd-client
+       - sssd-common
+       - sssd-ldap
+       - sssd-krb5
+       - openldap-clients
+       - sssd-proxy
+       - nss-pam-ldapd
+       - krb5-workstation
+       - sssd-tools
+
+   - name: create sssd configuration
+     template:
+       src: conf_files/sssd.conf
+       dest: /etc/sssd/sssd.conf
+       mode: 0600
+       backup: yes
+
+   - name: create sssdpamproxy auth provider
+     copy:
+       src: conf_files/sssdpamproxy
+       dest: /etc/pam.d/sssdpamproxy
+       mode: 0644
+       backup: yes
+
+
+   - name: backup existing authconfig
+     shell: authconfig --savebackup=authconfig-sssd-playbook-{{ ansible_date_time.iso8601 }}
+
+   - name: enable authconfig for sssd
+     shell: authconfig --enablesssd --enablesssdauth --disableldap --disableldapauth --update
+
+   - name: create ldap authenticator configuration
+     template:
+       src: conf_files/nslcd.conf
+       dest: /etc/nslcd.conf
+       mode: 0600
+       backup: yes
+
+   - name: enable sssd and nslcd services
+     service:
+       name: "{{ item }}"
+       enabled: yes
+       state: restarted
+     with_items:
+       - nslcd.service
+       - sssd.service
