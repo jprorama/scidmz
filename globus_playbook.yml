@@ -44,5 +44,6 @@
 
    vars:
      globus_endpoint_name: "{{ globus_username }}#{{ ansible_hostname }}"
+     globus_endpoint_restrict_paths: "RW/home"
    vars_files:
      - site_vars.yaml
