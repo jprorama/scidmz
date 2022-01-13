@@ -1,0 +1,66 @@
+---
+ - hosts: dtn
+   become: yes
+   become_user: root
+   gather_facts: yes
+   tasks:
+
+   - name: install globus repo
+     yum: name=https://downloads.globus.org/globus-connect-server/stable/installers/repo/rpm/globus-repo-latest.noarch.rpm state=present
+
+   - name: install epel repo
+     yum: name=epel-release state=present
+
+   - name: get globus gpg key
+     rpm_key: state=present key=https://downloads.globus.org/toolkit/gt6/stable/repo/rpm/RPM-GPG-KEY-Globus
+
+   - name: install yum-plugin-priorities
+     yum: name=yum-plugin-priorities state=present
+
+   - name: install globus-connect-server and required ansible packages
+     yum:
+       name: "{{ packages }}"
+       state: present
+       enablerepo: base
+     vars:
+       packages:
+         - globus-connect-server54
+         - expect
+
+ - hosts: dtn
+   become: yes
+   become_user: root
+   gather_facts: yes
+   tasks:
+
+   - template:
+       src: conf_files/globus-connect-server.conf
+       dest: /etc/globus-connect-server.conf
+       backup: yes
+
+   - ansible.builtin.shell: |
+       set timeout 300
+       spawn globus-connect-server endpoint setup "ansible-deploy" --organization "UAB" --client-id "6e2c5731-8416-458c-9ad7-e100ce1c2fc4" --owner "kingtc@uab.edu" --contact-email "kingtc@uab.edu" --agree-to-letsencrypt-tos
+       
+       expect "\nSecret*"
+       send "{{ globus_secret }}\n"
+
+       expect "\nDo you agree to these Terms of Service*"
+       send "y\n"
+
+       exit 0
+     args:
+       executable: /usr/bin/expect
+
+   vars_prompt:
+    - name: globus_secret
+      prompt: "Enter your Globus Endpoint Secret:"
+      private: yes
+    - name: globus_username
+      prompt: "Enter your Globus username:"
+
+   vars:
+     globus_endpoint_name: "{{ globus_username }}#{{ ansible_hostname }}"
+     globus_endpoint_restrict_paths: "RW/home"
+   vars_files:
+     - site_vars.yaml
