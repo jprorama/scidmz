@@ -83,3 +83,7 @@ This required a pexpect package installed on the DTNs.
 The pexpect version 2.3 included with CentOS7 is less than the reported
 compatible 3.3+ required by the expect module.  This step can be run by hand if
 if required dependency is not met.
+
+# Globus v5 endpoints
+
+In order to use the `globus_5_playbook.yml` playbook, you must register an endpoint at [the globus development portal](https://auth.globus.org/v2/web/developers) and use the associated client id/secret variables in group vars

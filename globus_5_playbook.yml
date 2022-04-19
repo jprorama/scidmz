@@ -33,31 +33,32 @@
    gather_facts: yes
    tasks:
 
-   - template:
-       src: conf_files/globus-connect-server.conf
-       dest: /etc/globus-connect-server.conf
-       backup: yes
-
-   - ansible.builtin.shell: |
+   - name: "Perform globus endpoint setup"
+     ansible.builtin.shell: |
+       log_file /tmp/globus-connect-server-endpoint-setup.log
        set timeout 300
-       spawn globus-connect-server endpoint setup "ansible-deploy" --organization "UAB" --client-id "6e2c5731-8416-458c-9ad7-e100ce1c2fc4" --owner "kingtc@uab.edu" --contact-email "kingtc@uab.edu" --agree-to-letsencrypt-tos
+       spawn globus-connect-server endpoint setup "{{ globus_endpoint_name }}" --organization "{{ globus_organization }}" --client-id "{{ globus_client_id }}" --owner "{{ globus_endpoint_owner }}" --contact-email "{{ globus_contact_email }}" --agree-to-letsencrypt-tos --deployment-key /etc/globus/deployment-key.json
        
-       expect "\nSecret*"
-       send "{{ globus_secret }}\n"
+       expect "Secret*"
+       send "{{ globus_endpoint_secret }}\r"
 
-       expect "\nDo you agree to these Terms of Service*"
-       send "y\n"
-
-       exit 0
+       expect eof
      args:
        executable: /usr/bin/expect
 
-   vars_prompt:
-    - name: globus_secret
-      prompt: "Enter your Globus Endpoint Secret:"
-      private: yes
-    - name: globus_username
-      prompt: "Enter your Globus username:"
+   - name: "Perform globus node setup"
+     ansible.builtin.shell: |
+       log_file /tmp/globus-connect-server-node-setup.log
+       set timeout 300
+       spawn globus-connect-server node setup --client-id "{{ globus_client_id }}" --ip-address {{ globus_endpoint_ipv4 }} --deployment-key /etc/globus/deployment-key.json
+
+       
+       expect "Secret*"
+       send "{{ globus_endpoint_secret }}\r"
+
+       expect eof
+     args:
+       executable: /usr/bin/expect
 
    vars:
      globus_endpoint_name: "{{ globus_username }}#{{ ansible_hostname }}"
