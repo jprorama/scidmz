@@ -83,3 +83,34 @@ This required a pexpect package installed on the DTNs.
 The pexpect version 2.3 included with CentOS7 is less than the reported
 compatible 3.3+ required by the expect module.  This step can be run by hand if
 if required dependency is not met.
+
+# Globus v5 endpoints
+
+In order to use the `globus_5_playbook.yml` playbook, you must register an endpoint at [the globus development portal](https://auth.globus.org/v2/web/developers) and use the associated client id/secret variables in group vars.
+
+## Setting up box connector
+
+Once globus v5 is set up and deployed, you can create a collection that supports box with the following commands:
+
+```bash
+globus-connect-server storage-gateway create box ${GATEWAY_NAME} --high-assurance --domain ${DOMAIN_SUFFIX} --authentication-timeout-mins ${TIMEOUT_IN_MINUTES} --box-settings file:${BOX_JSON_FILE}
+```
+
+With the following variables:
+
+* `$GATEWAY_NAME` - a short name to refer to the gateway by; in my testing, I had named it `ha-box-connector`
+* `${DOMAIN_SUFFIX}` - the domain you want to scope the gateway to; this is only a hard requirement with `--high-assurance`
+* `${TIMEOUT_IN_MINUTES}` - the web UI timeout for inactivity, in minutes; this is only a hard requirement with `--high-assurance`
+* `${BOX_JSON_FILE}` - a path to the box json file. You should be able to get a json file out of your box apps (found [here](https://uab.app.box.com/developers/console))
+
+This command will give a UUID to use with the next step.
+
+```bash
+globus-connect-server collection create ${GATEWAY_UUID} ${BOX_PATH} "${COLLECTION_NAME}"
+```
+
+With the following variables
+
+* `${GATEWAY_UUID}` - the UUID from the previous command.
+* `${BOX_PATH}` - The path to "scope" within box. For example, if you set the path as `/box`, it will only allow users to transfer files out of their box account if they had a folder in their root *named* `box`. If you set this as `/`, it will allow access to the user's entire box folder
+* `${COLLECTION_NAME}` - A friendly human-readable string; this will be searchable through the globus web interface.

@@ -1,0 +1,67 @@
+---
+ - hosts: dtn
+   become: yes
+   become_user: root
+   gather_facts: yes
+   tasks:
+
+   - name: install globus repo
+     yum: name=https://downloads.globus.org/globus-connect-server/stable/installers/repo/rpm/globus-repo-latest.noarch.rpm state=present
+
+   - name: install epel repo
+     yum: name=epel-release state=present
+
+   - name: get globus gpg key
+     rpm_key: state=present key=https://downloads.globus.org/toolkit/gt6/stable/repo/rpm/RPM-GPG-KEY-Globus
+
+   - name: install yum-plugin-priorities
+     yum: name=yum-plugin-priorities state=present
+
+   - name: install globus-connect-server and required ansible packages
+     yum:
+       name: "{{ packages }}"
+       state: present
+       enablerepo: base
+     vars:
+       packages:
+         - globus-connect-server54
+         - expect
+
+ - hosts: dtn
+   become: yes
+   become_user: root
+   gather_facts: yes
+   tasks:
+
+   - name: "Perform globus endpoint setup"
+     ansible.builtin.shell: |
+       log_file /tmp/globus-connect-server-endpoint-setup.log
+       set timeout 300
+       spawn globus-connect-server endpoint setup "{{ globus_endpoint_name }}" --organization "{{ globus_organization }}" --client-id "{{ globus_client_id }}" --owner "{{ globus_endpoint_owner }}" --contact-email "{{ globus_contact_email }}" --agree-to-letsencrypt-tos --deployment-key /etc/globus/deployment-key.json
+       
+       expect "Secret*"
+       send "{{ globus_endpoint_secret }}\r"
+
+       expect eof
+     args:
+       executable: /usr/bin/expect
+
+   - name: "Perform globus node setup"
+     ansible.builtin.shell: |
+       log_file /tmp/globus-connect-server-node-setup.log
+       set timeout 300
+       spawn globus-connect-server node setup --client-id "{{ globus_client_id }}" --ip-address {{ globus_endpoint_ipv4 }} --deployment-key /etc/globus/deployment-key.json
+
+       
+       expect "Secret*"
+       send "{{ globus_endpoint_secret }}\r"
+
+       expect eof
+     args:
+       executable: /usr/bin/expect
+
+   vars:
+     globus_endpoint_name: "{{ globus_username }}#{{ ansible_hostname }}"
+     globus_endpoint_restrict_paths: "RW/home"
+   vars_files:
+     - site_vars.yaml
