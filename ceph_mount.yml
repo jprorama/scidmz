@@ -1,0 +1,95 @@
+---
+ - hosts: dtn
+   become: yes
+   become_user: root
+   gather_facts: yes
+   vars_files:
+     - site_vars.yaml
+   tasks:
+   - name: Ensure prerequsite packages are installed
+     yum:
+       name:
+         - NetworkManager
+         - epel-release
+       state: present 
+
+   - name: Start NetworkManager service
+     ansible.builtin.systemd:
+       name: NetworkManager
+       state: started
+       enabled: yes
+
+   - name: Set up ceph vlan interface
+     community.general.nmcli:
+       conn_name: "{{ ceph_vlan.parent_device }}.{{ ceph_vlan.vlan_id }}"
+       type: vlan
+       vlandev: "{{ ceph_vlan.parent_device }}"
+       vlanid: "{{ ceph_vlan.vlan_id }}"
+       ip4: "{{ ceph_vlan.ipv4_addr }}"
+       state: present
+
+   - name: Update ca-certificates
+     yum:
+       name: ca-certificates
+       state: latest
+
+   - name: Get ceph gpg key
+     rpm_key:
+       state: present
+       key: https://download.ceph.com/keys/release.asc
+       #validate_certs: no # but why?
+
+   - name: Add ceph base repository
+     yum_repository:
+       name: Ceph
+       file: ceph
+       description: Ceph $basearch
+       baseurl: https://download.ceph.com/rpm-octopus/el7/$basearch
+       gpgkey: https://download.ceph.com/keys/release.asc
+       gpgcheck: yes
+
+   - name: Add ceph noarch repository
+     yum_repository:
+       name: Ceph-noarch
+       file: ceph
+       description: Ceph noarch
+       baseurl: https://download.ceph.com/rpm-octopus/el7/noarch
+       gpgkey: https://download.ceph.com/keys/release.asc
+       gpgcheck: yes
+
+   - name: Install ceph packages
+     yum:
+       name:
+         - ceph-common
+         - attr
+       state: present
+       update_cache: yes
+
+   - name: Write ceph.conf
+     ansible.builtin.template:
+       src: ceph.conf.j2
+       dest: /etc/ceph/ceph.conf
+       owner: root
+       group: root
+       mode: u=rw,g=r,o=r
+
+   - name: "Write ceph.client.{{ ceph_client_name }}.keyring"
+     ansible.builtin.template:
+       src: ceph.keyring.j2
+       dest: "/etc/ceph/ceph.client.{{ ceph_client_name }}.keyring"
+       owner: root
+       group: root
+       mode: u=rw,g=r,o=r
+
+   - name: "Ensure directory mountpoint {{ ceph_mountpoint }} exists"
+     ansible.builtin.file:
+       path: "{{ ceph_mountpoint }}"
+       state: directory
+
+   - name: Mount ceph
+     ansible.posix.mount:
+       path: "{{ ceph_mountpoint }}"
+       src: ":/"
+       fstype: ceph
+       opts: "_netdev,name={{ ceph_client_name }}"
+       state: mounted

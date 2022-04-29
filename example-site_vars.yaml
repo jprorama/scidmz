@@ -6,3 +6,21 @@
 # 
 timezone: 'US/Central'
 globus_endpoint_name: "{{ globus_username }}#{{ ansible_hostname }}"
+
+##
+# ceph variables
+##
+
+# ceph.conf item(s)
+fsid: "123e4567-e89b-12d3-a456-426614174000"
+mon_host_str: "[v2:10.1.2.1:3300/0,v1:10.1.2.1:6789/0] [v2:10.1.2.2:3300/0,v1:10.1.2.2:6789/0] [v2:10.1.2.3:3300/0,v1:10.1.2.3:6789/0]"
+# cephx client name/key
+ceph_client_name: "client-name"
+ceph_client_key: "dGhpcyBpcyB0b3RhbGx5IGEgdmVyeSByZWFsIHNlY3JldAo="
+# cephfs mount point
+ceph_mountpoint: "/ceph-mount-point"
+# ceph vlan configuration
+ceph_vlan:
+  parent_device: eth0
+  vlan_id: 1111
+  ipv4_addr: "10.1.3.123/22"
